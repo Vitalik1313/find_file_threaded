@@ -11,7 +11,9 @@
 pthread_t threads[THREAD_POOL_SIZE];
 
 unsigned int founded = 0;
-char homeDir[LEN] = "/home/vitalik13";
+
+//Specify home directory
+char homeDir[LEN] = "/home/";
 
 char* joinPath(const char *base, char *new)
 {
