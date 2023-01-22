@@ -1,0 +1,9 @@
+#FIND_FILE_THREADED
+The console program is designed to find paths to a file with a name specified by a command line parameter using threads.
+The starting point of searching is home directory, which you can specify in FileFinder.c file.
+
+#Compiling
+make
+
+#Usage
+./find <file_name>

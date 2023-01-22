@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <pthread.h>
 
-#include"FileFinder.h"
+#include "FileFinder.h"
 
 int main(int argc,char *argv[])
 {

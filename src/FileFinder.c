@@ -8,17 +8,20 @@
 #include"MyQueue.h"
 #include"FileFinder.h"
 
-unsigned int founded = 0;
-const char homeDir[LEN] = "/home/vitalik13";
+pthread_t threads[THREAD_POOL_SIZE];
 
-char *joinPath(const char *base, char *new)
+unsigned int founded = 0;
+char homeDir[LEN] = "/home/vitalik13";
+
+char* joinPath(const char *base, char *new)
 {
-    if (!new)
+    if (new == NULL)
     {
         return NULL;
     }
-    char *path = malloc(strlen(base) + strlen(new) + PATH_SEP_LEN);
-    if (!path)
+    char *path = malloc(strlen(base) + strlen(new) + PATH_SEPARATOR_LEN + 1);
+    
+    if (path == NULL)
     {
         fprintf(stderr, "Cannot allocate memory");
         exit(1);
@@ -31,61 +34,24 @@ char *joinPath(const char *base, char *new)
     return path;
 }
 
-
-int findInHomeDir(threadData *info)
-{
-    struct dirent *dir;
-    DIR *d = opendir(homeDir);
-    if (d == NULL)
-    {
-        fprintf(stderr, "Cannot open directory-- %s", homeDir);
-    }
-    if (d)
-    {
-        while ((dir = readdir(d)) != NULL && founded == 0)
-        {
-
-            if (strcmp(dir->d_name, ".") != 0 && strcmp(dir->d_name, "..") != 0)
-            {
-                char *path = joinPath(homeDir, dir->d_name);
-
-                if (dir->d_type == DT_DIR)
-                {
-                    enqueue(path);
-                }
-                else
-                {
-                    if (strcmp(dir->d_name, info->searchedFile) == 0)
-                    {
-                        printf("Path to searched file: %s\n", path);
-                        founded++;
-                    }
-                }
-                free(path);
-            }
-        }
-        closedir(d);
-    }
-    return 0;
-}
-
 void traverse_directory(char *name, char *currentDir)
 {
+    char* path;
     struct dirent *dir;
-    DIR *d = opendir(currentDir);
-    if (d == NULL)
+    DIR *traversed_directory = opendir(currentDir);
+    if (traversed_directory == NULL)
     {
         fprintf(stderr, "Cannot open directory - %s\n", currentDir);
         return;
     }
-    if (d)
+    if (traversed_directory)
     {
-        while ((dir = readdir(d)) != NULL)
+        while ((dir = readdir(traversed_directory)) != NULL)
         {
 
             if (strcmp(dir->d_name, ".") != 0 && strcmp(dir->d_name, "..") != 0)
             {
-                char *path = joinPath(currentDir, dir->d_name); 
+                path = joinPath(currentDir, dir->d_name); 
                 if(path == NULL)
                     break;
 
@@ -104,11 +70,11 @@ void traverse_directory(char *name, char *currentDir)
                 free(path);
             }
         }
-        closedir(d);
+        closedir(traversed_directory);
     }
 }
 
-void *thread_function(void *args)
+void* thread_function(void *args)
 {
     threadData *infoForThread = (threadData *)args;
     char *dirToFind = NULL;
@@ -121,7 +87,7 @@ void *thread_function(void *args)
     return NULL;
 }
 
-struct dirent **getHomeDirs(const char *currentDir, threadData *dataForThreads)
+struct dirent** getHomeDirs(const char *currentDir, threadData *dataForThreads)
 {
     struct dirent **namelist;
     int n;
@@ -137,19 +103,24 @@ struct dirent **getHomeDirs(const char *currentDir, threadData *dataForThreads)
 
 void find_file(char* fileName)
 {
-    threadData *dataThreads;
+    threadData *dataThreads = malloc(sizeof(threadData));
     
-    if(!(dataThreads = malloc(sizeof(threadData))))
+    if(dataThreads == NULL)
     {
         fprintf(stderr,"Cannot allocate memory for threads' data");
         exit(EXIT_FAILURE);
     }
 
     dataThreads->searchedFile = calloc(LEN, sizeof(char));
+    if(dataThreads->searchedFile == NULL)
+    {
+        fprintf(stderr,"Cannot allocate memory for threads' data file name");
+        exit(EXIT_FAILURE);
+    }
     strcpy(dataThreads->searchedFile, fileName);
     dataThreads->homeDirs = getHomeDirs(homeDir, dataThreads);
 
-    findInHomeDir(dataThreads);
+    traverse_directory(dataThreads->searchedFile, homeDir);
     start_routine(dataThreads);
     free(dataThreads);
 }

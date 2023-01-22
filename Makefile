@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS  = -g -Wall -pthread -D_DEFAULT_SOURCE -Iinclude
+CFLAGS  = -g -Wall -pthread -D_DEFAULT_SOURCE -I./include
 
 SRC:= ./src
 OBJDIR:=./obj
@@ -10,15 +10,15 @@ find:  MainFindFileThreaded.o FileFinder.o MyQueue.o
 	$(CC) $(CFLAGS) -o find MainFindFileThreaded.o FileFinder.o MyQueue.o 
 
 
-MainFindFileThreaded.o:  $(SRC)/MainFindFileThreaded.c include/FileFinder.h
+MainFindFileThreaded.o:  $(SRC)/MainFindFileThreaded.c 
 	$(CC) $(CFLAGS) -c $(SRC)/MainFindFileThreaded.c
 
 
-FileFinder.o:  $(SRC)/FileFinder.c  include/FileFinder.h include/MyQueue.h
+FileFinder.o:  $(SRC)/FileFinder.c  
 	$(CC) $(CFLAGS) -c $(SRC)/FileFinder.c
 
 
-MyQueue.o:  $(SRC)/MyQueue.c include/MyQueue.h 
+MyQueue.o:  $(SRC)/MyQueue.c
 	$(CC) $(CFLAGS) -c $(SRC)/MyQueue.c
 
 

@@ -4,14 +4,14 @@
 #include <string.h>
 #include <pthread.h>
 
-#include"MyQueue.h"
+#include "MyQueue.h"
 
 struct Node* rear = NULL;
 struct Node* front = NULL;
 
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
-struct Node *newNode(char *dir)
+struct Node* newNode(char *dir)
 {
     struct Node *node = (struct Node *)malloc(sizeof(struct Node));
     if (node != NULL)
@@ -33,7 +33,7 @@ struct Node *newNode(char *dir)
     }
 }
 
-char *dequeue()
+char* dequeue()
 {
     pthread_mutex_lock(&mutex);
 
@@ -47,7 +47,7 @@ char *dequeue()
     front = front->next;
 
     char *item = malloc((strlen(temp->dirName)+1)*sizeof(char));
-    if(!item)
+    if(item == NULL)
     {
         fprintf(stderr,"cannot allocate memory for return value\n");
         exit(EXIT_FAILURE);
