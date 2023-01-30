@@ -46,34 +46,33 @@ void traverse_directory(char *name, char *currentDir)
         fprintf(stderr, "Cannot open directory - %s\n", currentDir);
         return;
     }
-    if (traversed_directory)
+    
+    while ((dir = readdir(traversed_directory)) != NULL)
     {
-        while ((dir = readdir(traversed_directory)) != NULL)
+
+        if (strcmp(dir->d_name, ".") != 0 && strcmp(dir->d_name, "..") != 0)
         {
+            path = joinPath(currentDir, dir->d_name); 
+            if(path == NULL)
+                break;
 
-            if (strcmp(dir->d_name, ".") != 0 && strcmp(dir->d_name, "..") != 0)
-            {
-                path = joinPath(currentDir, dir->d_name); 
-                if(path == NULL)
-                    break;
-
-                if (dir->d_type == DT_DIR)
-                { 
-                    enqueue(path);
-                }
-                else
-                {
-                    if (strcmp(dir->d_name, name) == 0)
-                    {
-                        printf("Path to searched file: %s\n", path);
-                        founded++;
-                    }
-                }
-                free(path);
+            if (dir->d_type == DT_DIR)
+            { 
+                enqueue(path);
             }
+            else
+            {
+                if (strcmp(dir->d_name, name) == 0)
+                {
+                    printf("Path to searched file: %s\n", path);
+                    founded++;
+                }
+            }
+            free(path);
         }
-        closedir(traversed_directory);
     }
+    closedir(traversed_directory);
+    
 }
 
 void* thread_function(void *args)

@@ -4,7 +4,7 @@
 struct Node
 {
     char* dirName;
-    struct Node *next;
+    struct Node* next;
 }; 
 
 extern struct Node *rear; 
